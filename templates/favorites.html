@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'index' %}">Inicio</a>
+        <a href="{% url 'dashboard' %}">Explorar</a>
+        <a href="{% url 'settings' %}">Preferencias</a>
+        <div class="user-section">
+          <span class="welcome-user">Hola, {{ request.user.username }}!</span>
+          <a href="{% url 'logout' %}" class="login-btn">Cerrar sesión</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="favorites-section">
+      <h2>Tus favoritos</h2>
+      <p class="section-description">Tu colección personal de películas, series y libros</p>
+      
+      <div class="favorites-actions">
+        <button class="btn btn-secondary" onclick="clearAllFavorites()">Limpiar favoritos</button>
+        <button class="btn btn-secondary" onclick="exportFavorites()">Exportar lista</button>
+      </div>
+      
+      {% if favorites_list %}
+      <div id="favoritesList" class="content-grid">
+        {% for favorite in favorites_list %}
+        <div class="content-card" data-type="{{ favorite.tipo }}" data-id="{{ favorite.id_api }}">
+          <div class="content-header">
+            <div class="content-type">
+              {% if favorite.tipo == 'movie' %}🎥 Película
+              {% elif favorite.tipo == 'tv' %}📺 Serie  
+              {% else %}📚 Libro{% endif %}
+            </div>
+            <button class="btn-remove" onclick="removeFavorite('{{ favorite.tipo }}', '{{ favorite.id_api }}', '{{ favorite.titulo }}')">
+              🗑️
+            </button>
+          </div>
+          
+          <div class="content-body">
+            <h3>{{ favorite.titulo }}</h3>
+            <p class="content-description">{{ favorite.descripcion|truncatewords:20 }}</p>
+          </div>
+          
+          <div class="content-footer">
+            <span class="favorite-date">Agregado: {{ favorite.fecha_agregado|date:"d M Y" }}</span>
+            <div class="content-actions">
+              <a href="/detail/{{ favorite.tipo }}/{{ favorite.id_api }}/" class="btn btn-outline">
+                Ver detalles
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div id="noFav" class="empty-state">
+        <div class="empty-icon">⭐</div>
+        <h3>No hay favoritos aún</h3>
+        <p>Comienza a explorar contenido y guarda tus favoritos para verlos aquí.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-primary">Explorar contenido</a>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>StreamAdvisor - Suggestix</h3>
+          <p>Tu guía personalizada de entretenimiento</p>
+          <p class="tech-stack">Desarrollado con React Native, Node.js, PostgreSQL y Elasticsearch</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">Términos de servicio</a>
+          <a href="#">Política de privacidad</a>
+          <a href="#">Soporte</a>
+        </div>
+      </div>
+      <p class="copyright">Prototipo funcional - StreamAdvisor SpA &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script>
+  // Función para eliminar un favorito individual
+  function removeFavorite(itemType, itemId, itemTitle) {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${itemTitle}" de tus favoritos?`)) {
+      const formData = new FormData();
+      formData.append('item_type', itemType);
+      formData.append('item_id', itemId);
+      formData.append('csrfmiddlewaretoken', getCSRFToken());
+      
+      fetch('{% url "remove_favorite" %}', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification(`"${itemTitle}" eliminado de favoritos`, 'success');
+          // Recargar la página para actualizar la lista
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showNotification(data.message || 'Error al eliminar favorito', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error de conexión', 'error');
+      });
+    }
+  }
+
+  // Función para limpiar todos los favoritos
+  function clearAllFavorites() {
+    if (confirm('¿Estás seguro de que quieres eliminar TODOS tus favoritos?')) {
+      const formData = new FormData();
+      formData.append('csrfmiddlewaretoken', getCSRFToken());
+      
+      fetch('{% url "clear_favorites" %}', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification('Todos los favoritos han sido eliminados', 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showNotification(data.message || 'Error al eliminar favoritos', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error de conexión', 'error');
+      });
+    }
+  }
+
+  // Función para exportar favoritos (simulada)
+  function exportFavorites() {
+    showNotification('Función de exportación en desarrollo', 'info');
+  }
+
+  // Función para obtener CSRF token
+  function getCSRFToken() {
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // Función para mostrar notificaciones
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        <span class="notification-message">${message}</span>
+        <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+    `;
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-width: 300px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 3000);
+  }
+  </script>
+
+  <style>
+  .content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    position: relative;
+  }
+
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .content-type {
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .btn-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  .btn-remove:hover {
+    background: #fef2f2;
+  }
+
+  .content-body h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+  }
+
+  .content-description {
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .content-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .favorite-date {
+    font-size: 0.875rem;
+    color: #9ca3af;
+  }
+
+  .notification-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 16px;
+  }
+  </style>
+</body>
+</html>
+{% endblock content %}

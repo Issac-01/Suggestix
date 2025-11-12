@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'index' %}">Inicio</a>
+        <a href="{% url 'dashboard' %}">Explorar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>Crear Cuenta</h2>
+          <p>Únete a StreamAdvisor y descubre contenido increíble</p>
+        </div>
+
+        <form id="registerForm" class="auth-form" method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Nombre de usuario *</label>
+                <input type="text" id="id_username" name="username" required placeholder="juanperez">
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Contraseña *</label>
+                <input type="password" id="id_password1" name="password1" required placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirmar Contraseña *</label>
+                <input type="password" id="id_password2" name="password2" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                <span>Crear Cuenta</span>
+            </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>o regístrate con</span>
+        </div>
+
+        <div class="social-auth">
+          <button class="btn btn-social btn-google" onclick="socialLogin('google')">
+            <span class="social-icon">🔍</span>
+            Google
+          </button>
+          <button class="btn btn-social btn-facebook" onclick="socialLogin('facebook')">
+            <span class="social-icon">📘</span>
+            Facebook
+          </button>
+        </div>
+
+        <div class="auth-footer">
+          <p>¿Ya tienes una cuenta? <a href="login.html" class="auth-link">Inicia sesión aquí</a></p>
+        </div>
+      </div>
+
+      <div class="auth-features">
+        <h3>Comienza tu viaje de descubrimiento</h3>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-icon">🤖</span>
+            <div>
+              <strong>Algoritmo inteligente</strong>
+              <p>Nuestro sistema aprende de tus preferencias para ofrecerte contenido relevante</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🎬</span>
+            <div>
+              <strong>Multiplataforma</strong>
+              <p>Películas, series y libros en un solo lugar</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔒</span>
+            <div>
+              <strong>Privacidad garantizada</strong>
+              <p>Tus datos están seguros con nosotros</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🌍</span>
+            <div>
+              <strong>Comunidad global</strong>
+              <p>Conecta con otros amantes del entretenimiento</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-preview">
+          <h4>Únete a nuestra comunidad</h4>
+          <div class="stats-grid">
+            <div class="stat">
+              <span class="stat-number">12,847</span>
+              <span class="stat-label">usuarios</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">45,231</span>
+              <span class="stat-label">recomendaciones diarias</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">94%</span>
+              <span class="stat-label">satisfacción</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>StreamAdvisor - Suggestix</h3>
+          <p>Tu guía personalizada de entretenimiento</p>
+          <p class="tech-stack">Desarrollado con React Native, Node.js, PostgreSQL y Elasticsearch</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">Términos de servicio</a>
+          <a href="#">Política de privacidad</a>
+          <a href="#">Soporte</a>
+        </div>
+      </div>
+      <p class="copyright">Prototipo funcional - StreamAdvisor SpA &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  
+  <!-- Incluir el sistema de base de datos -->
+<script src="database.js"></script>
+<script src="auth.js"></script>
+
+<script>
+// Inicializar y verificar autenticación
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkAuthentication();
+    updateUIForAuthentication(!!getCurrentSession());
+});
+</script>
+</body>
+</html>
+{% endblock content %}

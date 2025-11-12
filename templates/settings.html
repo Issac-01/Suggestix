@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'index' %}">Inicio</a>
+        <a href="{% url 'dashboard' %}">Explorar</a>
+        <a href="{% url 'favorites' %}">Favoritos</a>
+        <div class="user-section">
+          <span class="welcome-user">Hola, {{ username }}!</span>
+          <a href="{% url 'logout' %}" class="login-btn">Cerrar sesión</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="preferences-section">
+      <h2>Preferencias</h2>
+      <p class="section-description">Personaliza tus géneros favoritos para mejorar las recomendaciones.</p>
+      
+      <form id="prefsForm" class="preferences-form">
+        <div class="preferences-grid">
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Acción">
+            <span class="checkmark"></span>
+            Acción
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Comedia">
+            <span class="checkmark"></span>
+            Comedia
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Drama">
+            <span class="checkmark"></span>
+            Drama
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Ciencia ficción">
+            <span class="checkmark"></span>
+            Ciencia ficción
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Fantasía">
+            <span class="checkmark"></span>
+            Fantasía
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Terror">
+            <span class="checkmark"></span>
+            Terror
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Romance">
+            <span class="checkmark"></span>
+            Romance
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Aventura">
+            <span class="checkmark"></span>
+            Aventura
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Misterio">
+            <span class="checkmark"></span>
+            Misterio
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Documental">
+            <span class="checkmark"></span>
+            Documental
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Animación">
+            <span class="checkmark"></span>
+            Animación
+          </label>
+          <label class="genre-option">
+            <input type="checkbox" name="genres" value="Musical">
+            <span class="checkmark"></span>
+            Musical
+          </label>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Guardar preferencias</button>
+          <a href="dashboard.html" class="btn btn-secondary">Ver recomendaciones</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>StreamAdvisor - Suggestix</h3>
+          <p>Tu guía personalizada de entretenimiento</p>
+          <p class="tech-stack">Desarrollado con React Native, Node.js, PostgreSQL y Elasticsearch</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">Términos de servicio</a>
+          <a href="#">Política de privacidad</a>
+          <a href="#">Soporte</a>
+        </div>
+      </div>
+      <p class="copyright">Prototipo funcional - StreamAdvisor SpA &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <!-- Incluir el sistema de base de datos -->
+<script src="database.js"></script>
+<script src="auth.js"></script>
+
+<script>
+// Inicializar y verificar autenticación
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkAuthentication();
+    updateUIForAuthentication(!!getCurrentSession());
+});
+</script>
+</body>
+</html>
+{% endblock content %}

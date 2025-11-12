@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'index' %}">Inicio</a>
+        <a href="{% url 'dashboard' %}">Explorar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>Iniciar Sesión</h2>
+          <p>Accede a tu cuenta para disfrutar de recomendaciones personalizadas</p>
+        </div>
+
+        <form id="loginForm" class="auth-form" method="POST" action="{% url 'login' %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="id_username">Nombre de usuario</label>
+            <input type="text" id="id_username" name="username" required placeholder="juanperez">
+            <div class="error-message" id="usernameError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="id_password">Contraseña</label>
+            <input type="password" id="id_password" name="password" required placeholder="••••••••">
+            <div class="error-message" id="passwordError"></div>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-option">
+              <input type="checkbox" id="rememberMe" name="rememberMe">
+              <span class="checkmark"></span>
+              Recordar sesión
+            </label>
+            <a href="#" class="forgot-password" onclick="showForgotPassword()">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="loginBtnText">Iniciar Sesión</span>
+            <div id="loginSpinner" class="spinner" style="display: none;"></div>
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>o continúa con</span>
+        </div>
+
+        <div class="social-auth">
+          <button class="btn btn-social btn-google" onclick="socialLogin('google')">
+            <span class="social-icon">🔍</span>
+            Google
+          </button>
+          <button class="btn btn-social btn-facebook" onclick="socialLogin('facebook')">
+            <span class="social-icon">📘</span>
+            Facebook
+          </button>
+        </div>
+
+        <div class="auth-footer">
+          <p>¿No tienes una cuenta? <a href="{% url 'register' %}" class="auth-link">Regístrate aquí</a></p>
+        </div>
+      </div>
+
+      <div class="auth-features">
+        <h3>Ventajas de tener una cuenta</h3>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-icon">🎯</span>
+            <div>
+              <strong>Recomendaciones personalizadas</strong>
+              <p>Contenido seleccionado especialmente para tus gustos</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">❤️</span>
+            <div>
+              <strong>Guarda tus favoritos</strong>
+              <p>Crea tu colección personal de películas, series y libros</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📱</span>
+            <div>
+              <strong>Sincronización multiplataforma</strong>
+              <p>Accede desde cualquier dispositivo</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔄</span>
+            <div>
+              <strong>Actualizaciones en tiempo real</strong>
+              <p>Nuevas recomendaciones basadas en tu actividad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de recuperación de contraseña -->
+  <div id="forgotPasswordModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Recuperar Contraseña</h3>
+        <button class="modal-close" onclick="closeModal('forgotPasswordModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
+        <form id="forgotPasswordForm">
+          <div class="form-group">
+            <label for="recoveryEmail">Correo electrónico</label>
+            <input type="email" id="recoveryEmail" required placeholder="tu@email.com">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Enviar enlace de recuperación</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>StreamAdvisor - Suggestix</h3>
+          <p>Tu guía personalizada de entretenimiento</p>
+          <p class="tech-stack">Desarrollado con React Native, Node.js, PostgreSQL y Elasticsearch</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">Términos de servicio</a>
+          <a href="#">Política de privacidad</a>
+          <a href="#">Soporte</a>
+        </div>
+      </div>
+      <p class="copyright">Prototipo funcional - StreamAdvisor SpA &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+{% endblock content %}

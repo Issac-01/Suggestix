@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: suggestix_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .  
+      dockerfile: Dockerfile  
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app  
+    ports:
+      - "8000:8000"
+    environment:  
+      - DATABASE_URL=postgres://user:password@db:5432/suggestix_db
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-desarrollo-123
+      - TMDB_API_KEY=79b1de1d435f3be7cc69c4cff49c85e1
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./suggestix_web
+      dockerfile: Dockerfile.frontend 
+    volumes:
+      - ./suggestix_web:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:8000/api/v1 
+
+volumes:
+  postgres_data:

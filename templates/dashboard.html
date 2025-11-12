@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'index' %}">Inicio</a>
+        <a href="{% url 'favorites' %}">Favoritos</a>
+        <a href="{% url 'settings' %}">Preferencias</a>
+        <div class="user-section">
+          <span class="welcome-user">Hola, {{ username }}!</span>
+          <a href="{% url 'logout' %}" class="login-btn">Cerrar sesión</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="recommendations-section">
+      <h2>Recomendaciones para ti</h2>
+      <p class="section-description">Descubre contenido personalizado según tus preferencias</p>
+      
+      <!-- Barra de filtros (MANTENIENDO TU DISEÑO) -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label for="typeFilter">Tipo:</label>
+          <select id="typeFilter" onchange="applyFilters()">
+            <option value="all">Todos</option>
+            <option value="movie">Películas</option>
+            <option value="tv">Series</option>
+            <option value="book">Libros</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="genreFilter">Género:</label>
+          <select id="genreFilter" onchange="applyFilters()">
+            <option value="all">Todos</option>
+            <option value="Drama">Drama</option>
+            <option value="Ciencia ficción">Ciencia ficción</option>
+            <option value="Fantasía">Fantasía</option>
+            <option value="Comedia">Comedia</option>
+            <option value="Acción">Acción</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="sortFilter">Ordenar por:</label>
+          <select id="sortFilter" onchange="applyFilters()">
+            <option value="rating">Mejor rating</option>
+            <option value="year">Más reciente</option>
+            <option value="title">A-Z</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="searchFilter">Buscar:</label>
+          <input type="text" id="searchFilter" placeholder="Título, descripción..." onkeyup="applyFilters()">
+        </div>
+        
+        <button class="btn btn-outline" onclick="clearFilters()">Limpiar filtros</button>
+      </div>
+
+      <!-- CONTENIDO REAL DE LAS APIS -->
+      <div id="recommendations" class="content-grid">
+        <!-- Películas -->
+        {% for movie in recommendations.movies %}
+        <div class="content-card" data-type="movie" data-rating="{{ movie.rating }}" data-title="{{ movie.titulo|lower }}">
+            {% if movie.imagen %}
+            <img src="{{ movie.imagen }}" alt="{{ movie.titulo }}" class="content-image">
+            {% else %}
+            <div class="content-image placeholder">🎬</div>
+            {% endif %}
+            <div class="content-info">
+                <h4>{{ movie.titulo }}</h4>
+                <p class="content-description">{{ movie.descripcion|truncatewords:15 }}</p>
+                <div class="content-meta">
+                    <span class="rating">⭐ {{ movie.rating }}</span>
+                    <div class="content-actions">
+                        <button class="btn-action btn-favorite" onclick="addToFavorites('movie', '{{ movie.id }}', '{{ movie.titulo }}')">
+                            ❤️ Favorito
+                        </button>
+                        <button class="btn-action btn-detail" onclick="showDetails('movie', '{{ movie.id }}')">
+                          <a href="/detail/{{ favorite.tipo }}/{{ favorite.id_api }}/"></a>
+                            🔍 Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Series -->
+        {% for series in recommendations.series %}
+        <div class="content-card" data-type="tv" data-rating="{{ series.rating }}" data-title="{{ series.titulo|lower }}">
+            {% if series.imagen %}
+            <img src="{{ series.imagen }}" alt="{{ series.titulo }}" class="content-image">
+            {% else %}
+            <div class="content-image placeholder">📺</div>
+            {% endif %}
+            <div class="content-info">
+                <h4>{{ series.titulo }}</h4>
+                <p class="content-description">{{ series.descripcion|truncatewords:15 }}</p>
+                <div class="content-meta">
+                    <span class="rating">⭐ {{ series.rating }}</span>
+                    <div class="content-actions">
+                        <button class="btn-action btn-favorite" onclick="addToFavorites('series', '{{ series.id }}', '{{ series.titulo }}')">
+                            ❤️ Favorito
+                        </button>
+                        <button class="btn-action btn-detail" onclick="showDetails('tv', '{{ series.id }}')">
+                          <a href="/detail/{{ favorite.tipo }}/{{ favorite.id_api }}/"></a>
+                            🔍 Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Libros -->
+        {% for book in recommendations.books %}
+        <div class="content-card" data-type="book" data-year="{{ book.year }}" data-title="{{ book.titulo|lower }}">
+            {% if book.imagen %}
+            <img src="{{ book.imagen }}" alt="{{ book.titulo }}" class="content-image">
+            {% else %}
+            <div class="content-image placeholder">📖</div>
+            {% endif %}
+            <div class="content-info">
+                <h4>{{ book.titulo }}</h4>
+                <p class="content-description">{{ book.descripcion }}</p>
+                <div class="content-meta">
+                    <span class="year">📅 {{ book.year }}</span>
+                    <div class="content-actions">
+                        <button class="btn-action btn-favorite" onclick="addToFavorites('book', '{{ book.id }}', '{{ book.titulo }}')">
+                            ❤️ Favorito
+                        </button>
+                        <button class="btn-action btn-detail" onclick="showDetails('book', '{{ book.id }}')">
+                          <a href="/detail/{{ favorite.tipo }}/{{ favorite.id_api }}/"></a>
+                            🔍 Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Mensaje si no hay contenido -->
+      {% if not recommendations.movies and not recommendations.series and not recommendations.books %}
+      <div class="no-content">
+        <p>No hay recomendaciones disponibles en este momento.</p>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>StreamAdvisor - Suggestix</h3>
+          <p>Tu guía personalizada de entretenimiento</p>
+          <p class="tech-stack">Desarrollado con React Native, Node.js, PostgreSQL y Elasticsearch</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">Términos de servicio</a>
+          <a href="#">Política de privacidad</a>
+          <a href="#">Soporte</a>
+        </div>
+      </div>
+      <p class="copyright">Prototipo funcional - StreamAdvisor SpA &copy; 2023</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript para filtros (MANTENIENDO TU FUNCIONALIDAD) -->
+  <script>
+  function applyFilters() {
+    const typeFilter = document.getElementById('typeFilter').value;
+    const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+    const cards = document.querySelectorAll('.content-card');
+    
+    let visibleCards = 0;
+    
+    cards.forEach(card => {
+      const cardType = card.getAttribute('data-type');
+      const cardTitle = card.getAttribute('data-title');
+      
+      const typeMatch = typeFilter === 'all' || cardType === typeFilter;
+      const searchMatch = !searchFilter || cardTitle.includes(searchFilter);
+      
+      if (typeMatch && searchMatch) {
+        card.style.display = 'block';
+        visibleCards++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    
+    // Mostrar mensaje si no hay resultados
+    const noContent = document.querySelector('.no-content');
+    if (noContent) {
+      noContent.style.display = visibleCards === 0 ? 'block' : 'none';
+    }
+  }
+  
+  function clearFilters() {
+    document.getElementById('typeFilter').value = 'all';
+    document.getElementById('searchFilter').value = '';
+    document.getElementById('genreFilter').value = 'all';
+    document.getElementById('sortFilter').value = 'rating';
+    applyFilters();
+  }
+
+  // Aplicar filtros al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+    applyFilters();
+  });
+  </script>
+
+  <script>
+  // Función para agregar a favoritos
+  function addToFavorites(itemType, itemId, itemTitle) {
+      console.log('Agregando a favoritos:', itemType, itemId, itemTitle);
+      
+      // Obtener el CSRF token correctamente
+      const csrfToken = getCSRFToken();
+      
+      const formData = new FormData();
+      formData.append('item_type', itemType);
+      formData.append('item_id', itemId);
+      formData.append('item_title', itemTitle);
+      
+      fetch('{% url "add_favorite" %}', {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': csrfToken
+          },
+          body: formData
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor');
+          }
+          return response.json();
+      })
+      .then(data => {
+          console.log('Respuesta del servidor:', data);
+          if (data.success) {
+              showNotification(`"${itemTitle}" agregado a favoritos!`, 'success');
+          } else {
+              showNotification(data.message || 'Error al agregar a favoritos', 'error');
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          showNotification('Error de conexión: ' + error.message, 'error');
+      });
+  }
+
+  
+
+  // Función para obtener el CSRF token
+  function getCSRFToken() {
+      const name = 'csrftoken';
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  // Función para mostrar detalles (sin cambios)
+  function showDetails(itemType, itemId) {
+      window.location.href = `{% url "detail" "movie" "0" %}`.replace('movie/0', `${itemType}/${itemId}`);
+  }
+
+  // Función para mostrar notificaciones (sin cambios)
+  function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.innerHTML = `
+          <div class="notification-content">
+              <span class="notification-message">${message}</span>
+              <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+          </div>
+      `;
+      
+      notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+          color: white;
+          padding: 12px 16px;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 1000;
+          max-width: 300px;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+          if (notification.parentElement) {
+              notification.remove();
+          }
+      }, 3000);
+  }
+  </script>
+
+  <script>
+  // FUNCIÓN DE PRUEBA - ELIMINAR DESPUÉS
+  function testFavorites() {
+      console.log('=== TEST FAVORITOS ===');
+      console.log('CSRF Token:', getCSRFToken());
+      console.log('URL:', '{% url "add_favorite" %}');
+      
+      // Probar con datos de ejemplo
+      const testData = {
+          item_type: 'movie',
+          item_id: '550', // Fight Club
+          item_title: 'Fight Club'
+      };
+      
+      addToFavorites(testData.item_type, testData.item_id, testData.item_title);
+  }
+
+  // Ejecutar test después de 2 segundos (opcional)
+  // setTimeout(testFavorites, 2000);
+  </script>
+
+</body>
+</html>
+{% endblock content %}

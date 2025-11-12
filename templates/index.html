@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'dashboard' %}">Explorar</a>
+        <a href="{% url 'favorites' %}">Favoritos</a>
+        <a href="{% url 'settings' %}">Preferencias</a>
+        <div class="user-section">
+            <button id="loginBtn" class="login-btn" onclick="redirectToLogin()">
+              <a href="{% url 'login' %}">Iniciar sesión</a>
+            </button>
+            <button id="loginBtn" class="login-btn" onclick="redirectToRegister()">
+              <a href="{% url 'register' %}">Registrarse</a>
+            </button>
+          </div>          
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Encuentra tu próximo favorito</h2>
+        <p>Recomendaciones personalizadas de películas, series y libros con tecnología de machine learning.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="{% url 'dashboard' %}">Comenzar a explorar</a>
+          <a class="btn btn-secondary" href="{% url 'settings' %}">Configurar preferencias</a>
+          <a href="{% url 'login' %}" class="btn btn-outline"><span>🔐</span> Iniciar Sesión</a>
+          <a href="{% url 'register' %}" class="btn btn-primary"><span>🚀</span> Crear Cuenta</a>
+        </div>
+        
+        <!-- Estadísticas en tiempo real -->
+        <div class="live-stats">
+          <div class="stat-item">
+            <span class="stat-number" id="userCount">1,247</span>
+            <span class="stat-label">usuarios activos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="contentCount">8,956</span>
+            <span class="stat-label">títulos disponibles</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="matchRate">94%</span>
+            <span class="stat-label">tasa de acierto</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="content-preview">
+          <div class="preview-item movie">🎬</div>
+          <div class="preview-item series">📺</div>
+          <div class="preview-item book">📚</div>
+        </div>
+        
+        <!-- Badge de recomendaciones personalizadas -->
+        <div class="personalization-badge">
+          <div class="badge-icon">✨</div>
+          <div class="badge-content">
+            <strong>Recomendaciones 100% personalizadas</strong>
+            <span>Basadas en tus gustos y preferencias</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2>¿Por qué StreamAdvisor?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Algoritmos inteligentes</h3>
+          <p>Nuestro sistema de recomendación aprende de tus preferencias para ofrecerte contenido relevante.</p>
+          <div class="feature-stats">
+            <span class="stat">+94% de precisión</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Búsqueda avanzada</h3>
+          <p>Encuentra rápidamente lo que buscas con nuestro motor de búsqueda potenciado por Elasticsearch.</p>
+          <div class="feature-stats">
+            <span class="stat">Búsqueda en 0.2s</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Multiplataforma</h3>
+          <p>Disfruta de StreamAdvisor en todos tus dispositivos con nuestra aplicación React Native.</p>
+          <div class="feature-stats">
+            <span class="stat">3 plataformas</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Recomendaciones precisas</h3>
+          <p>Sistema de puntuación avanzado que considera múltiples factores para cada recomendación.</p>
+          <div class="feature-stats">
+            <span class="stat">5 factores clave</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Actualizaciones en tiempo real</h3>
+          <p>Tu perfil se actualiza instantáneamente con cada interacción para mejorar las recomendaciones.</p>
+          <div class="feature-stats">
+            <span class="stat">Tiempo real</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Privacidad garantizada</h3>
+          <p>Tus datos están seguros con nosotros. Cumplimos con los más altos estándares de seguridad.</p>
+          <div class="feature-stats">
+            <span class="stat">100% seguro</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quick-actions">
+      <h2>Comienza tu experiencia</h2>
+      <p class="section-description">Elige cómo quieres empezar a descubrir contenido increíble</p>
+      
+      <div class="actions-grid">
+        <div class="action-card">
+          <div class="action-icon">🚀</div>
+          <h3>Explorar contenido</h3>
+          <p>Descubre películas, series y libros recomendados específicamente para ti.</p>
+          <a class="btn btn-primary" href="{% url 'dashboard' %}">Explorar ahora</a>
+          <div class="action-tip">
+            <span>💡 Basado en tendencias globales</span>
+          </div>
+        </div>
+        <div class="action-card">
+          <div class="action-icon">⚙️</div>
+          <h3>Personalizar preferencias</h3>
+          <p>Configura tus géneros favoritos para obtener recomendaciones más precisas.</p>
+          <a class="btn btn-secondary" href="{% url 'settings' %}">Configurar ahora</a>
+          <div class="action-tip">
+            <span>🎯 Mejora tu experiencia</span>
+          </div>
+        </div>
+        <div class="action-card">
+          <div class="action-icon">🔐</div>
+          <h3>Únete a la comunidad</h3>
+          <p>Crea una cuenta para guardar favoritos y obtener recomendaciones personalizadas.</p>
+          <div class="auth-action-buttons">
+            <button class="btn btn-primary" onclick="redirectToRegister()">
+              <span>🌟</span>
+              <a href="{% url 'register' %}">Crear Cuenta</a>
+            </button>
+            <button class="btn btn-outline" onclick="redirectToLogin()">
+              <a href="{% url 'login' %}">Ya tengo cuenta</a>
+            </button>
+          </div>
+          <div class="action-tip">
+            <span>✨ Experiencia completa</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nueva sección: Trending Now -->
+    <section class="trending-section">
+      <h2>Trending Now</h2>
+      <p class="section-description">Lo que otros usuarios están descubriendo ahora mismo</p>
+      
+      <div class="trending-grid">
+        <div class="trending-item">
+          <div class="trending-badge">🔥 Trending</div>
+          <div class="trending-content">
+            <h4>Código Alfa</h4>
+            <p>Serie · Ciencia ficción</p>
+            <div class="trending-stats">
+              <span>⭐ 4.5</span>
+              <span>👥 1.2k vistas</span>
+            </div>
+          </div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-badge">🎬 Nuevo</div>
+          <div class="trending-content">
+            <h4>Luz de Medianoche</h4>
+            <p>Película · Drama</p>
+            <div class="trending-stats">
+              <span>⭐ 4.2</span>
+              <span>👥 894 vistas</span>
+            </div>
+          </div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-badge">📚 Popular</div>
+          <div class="trending-content">
+            <h4>El Sendero de los Sueños</h4>
+            <p>Libro · Fantasía</p>
+            <div class="trending-stats">
+              <span>⭐ 4.7</span>
+              <span>👥 2.1k vistas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nueva sección: Testimonios -->
+    <section class="testimonials-section">
+      <h2>Lo que dicen nuestros usuarios</h2>
+      <p class="section-description">Descubre cómo StreamAdvisor está transformando la forma de encontrar contenido</p>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            <div class="stars">⭐⭐⭐⭐⭐</div>
+            <p>"StreamAdvisor encontró exactamente lo que me gusta. ¡Las recomendaciones son increíblemente precisas!"</p>
+          </div>
+          <div class="testimonial-author">
+            <div class="author-avatar">👩‍💼</div>
+            <div class="author-info">
+              <strong>María González</strong>
+              <span>Usuaria desde 2023</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            <div class="stars">⭐⭐⭐⭐⭐</div>
+            <p>"Finalmente una app que entiende mis gustos. He descubierto joyas que nunca hubiera encontrado por mi cuenta."</p>
+          </div>
+          <div class="testimonial-author">
+            <div class="author-avatar">👨‍💻</div>
+            <div class="author-info">
+              <strong>Carlos Rodríguez</strong>
+              <span>Usuaria desde 2023</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            <div class="stars">⭐⭐⭐⭐⭐</div>
+            <p>"La interfaz es intuitiva y las recomendaciones mejoran cada día. ¡Imprescindible para cualquier amante del entretenimiento!"</p>
+          </div>
+          <div class="testimonial-author">
+            <div class="author-avatar">👩‍🎓</div>
+            <div class="author-info">
+              <strong>Ana Martínez</strong>
+              <span>Usuaria desde 2023</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    <section class="cta-section" id="ctaSection">
+      <div class="cta-content">
+        <h2>¿Listo para descubrir contenido increíble?</h2>
+        <p>Únete a miles de usuarios que ya están disfrutando de recomendaciones personalizadas</p>
+        <div class="cta-buttons">
+          <button class="btn btn-primary btn-large" onclick="redirectToRegister()">
+            <span>🚀</span>
+            <a href="{% url 'register' %}">Crear Cuenta Gratis</a>
+          </button>
+          <button class="btn btn-outline btn-large" onclick="redirectToLogin()">
+            <span>🔐</span>
+            <a href="{% url 'login' %}">Iniciar Sesión</a>
+          </button>
+        </div>
+        <div class="cta-features">
+          <span>✅ Sin compromiso</span>
+          <span>✅ Configuración en 2 minutos</span>
+          <span>✅ Recomendaciones inmediatas</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>StreamAdvisor - Suggestix</h3>
+          <p>Tu guía personalizada de entretenimiento</p>
+          <p class="tech-stack">Desarrollado con React Native, Node.js, PostgreSQL y Elasticsearch</p>
+          
+          <!-- Redes sociales -->
+          <div class="social-links">
+            <a href="#" class="social-link">📘 Facebook</a>
+            <a href="#" class="social-link">🐦 Twitter</a>
+            <a href="#" class="social-link">📷 Instagram</a>
+            <a href="#" class="social-link">💼 LinkedIn</a>
+          </div>
+        </div>
+        
+        <div class="footer-links-grid">
+          <div class="footer-links-column">
+            <h4>Producto</h4>
+            <a href="{% url 'dashboard' %}">Explorar</a>
+            <a href="{% url 'favorites' %}">Favoritos</a>
+            <a href="{% url 'settings' %}">Preferencias</a>
+            <a href="#">API</a>
+          </div>
+          
+          <div class="footer-links-column">
+            <h4>Compañía</h4>
+            <a href="#">Sobre nosotros</a>
+            <a href="#">Blog</a>
+            <a href="#">Carreras</a>
+            <a href="#">Contacto</a>
+          </div>
+          
+          <div class="footer-links-column">
+            <h4>Legal</h4>
+            <a href="#">Términos de servicio</a>
+            <a href="#">Política de privacidad</a>
+            <a href="#">Cookies</a>
+            <a href="#">Soporte</a>
+          </div>
+          
+          <div class="footer-links-column">
+            <h4>Plataformas</h4>
+            <a href="#">iOS App</a>
+            <a href="#">Android App</a>
+            <a href="#">Web</a>
+            <a href="#">Smart TV</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-newsletter">
+        <div class="newsletter-content">
+          <h4>📧 Mantente actualizado</h4>
+          <p>Recibe las últimas recomendaciones y novedades en tu email</p>
+        </div>
+        <div class="newsletter-form">
+          <input type="email" placeholder="tu@email.com" class="newsletter-input">
+          <button class="btn btn-primary">Suscribirse</button>
+        </div>
+      </div>
+      
+      <p class="copyright">Prototipo funcional - StreamAdvisor SpA &copy; 2023 · Hecho con ❤️ para amantes del entretenimiento</p>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/app.js' %}"></script>
+  
+  <!-- Script adicional para funcionalidades específicas del index -->
+  <script>
+  // Funciones de redirección
+  function redirectToLogin() {
+    window.location.href = 'login.html';
+  }
+
+  function redirectToRegister() {
+    window.location.href = 'register.html';
+  }
+
+  // Animaciones para estadísticas en tiempo real
+  function animateCounter(element, target, duration = 2000) {
+    let start = 0;
+    const increment = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        element.textContent = target.toLocaleString();
+        clearInterval(timer);
+      } else {
+        element.textContent = Math.floor(start).toLocaleString();
+      }
+    }, 16);
+  }
+
+  // Inicializar animaciones cuando la página carga
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animar contadores
+    const userCount = document.getElementById('userCount');
+    const contentCount = document.getElementById('contentCount');
+    
+    if (userCount) animateCounter(userCount, 1247);
+    if (contentCount) animateCounter(contentCount, 8956);
+    
+    // Efecto de escritura para el match rate
+    const matchRate = document.getElementById('matchRate');
+    if (matchRate) {
+      let current = 0;
+      const target = 94;
+      const interval = setInterval(() => {
+        current += 2;
+        matchRate.textContent = current + '%';
+        if (current >= target) {
+          matchRate.textContent = target + '%';
+          clearInterval(interval);
+        }
+      }, 50);
+    }
+    
+    // Efecto de parpadeo para el avatar si no hay usuario
+    const userAvatar = document.getElementById('userAvatar');
+    if (userAvatar && !getUser()) {
+      setInterval(() => {
+        userAvatar.style.boxShadow = userAvatar.style.boxShadow ? 
+          '' : '0 0 20px rgba(59, 130, 246, 0.5)';
+      }, 1000);
+    }
+
+    // Actualizar visibilidad de botones de autenticación
+    updateAuthButtonsVisibility();
+  });
+
+  // Función para obtener usuario (desde app.js)
+  function getUser() {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  }
+
+  // Actualizar visibilidad de botones de autenticación
+  function updateAuthButtonsVisibility() {
+    const user = getUser();
+    const authButtons = document.getElementById('authButtons');
+    const authHeroButtons = document.getElementById('authHeroButtons');
+    const ctaSection = document.getElementById('ctaSection');
+    
+    if (user) {
+      // Usuario logueado - ocultar botones de autenticación
+      if (authButtons) authButtons.style.display = 'none';
+      if (authHeroButtons) authHeroButtons.style.display = 'none';
+      if (ctaSection) ctaSection.style.display = 'none';
+    } else {
+      // Usuario no logueado - mostrar botones de autenticación
+      if (authButtons) authButtons.style.display = 'flex';
+      if (authHeroButtons) authHeroButtons.style.display = 'flex';
+      if (ctaSection) ctaSection.style.display = 'block';
+    }
+  }
+  </script>
+  <!-- Incluir el sistema de base de datos -->
+<script src="database.js"></script>
+<script src="auth.js"></script>
+
+<script>
+// Inicializar y verificar autenticación
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkAuthentication();
+    updateUIForAuthentication(!!getCurrentSession());
+});
+</script>
+</body>
+{% endblock content %}

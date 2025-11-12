@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="logo">
+        <h1>StreamAdvisor</h1>
+        <span class="beta-tag">Suggestix</span>
+      </div>
+      <nav>
+        <a href="{% url 'dashboard' %}">← Volver al Dashboard</a>
+        <a href="{% url 'favorites' %}">Favoritos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if details %}
+    <div class="detail-container">
+      <div class="detail-header">
+        <h1>{{ details.title|default:details.name|default:"Sin título" }}</h1>
+        <span class="detail-source">{{ details.source }}</span>
+      </div>
+      
+      <div class="detail-content">
+        <div class="detail-poster">
+          {% if details.poster_path %}
+          <img src="https://image.tmdb.org/t/p/w500{{ details.poster_path }}" 
+               alt="{{ details.title|default:details.name|default:'Imagen' }}" 
+               class="poster-image">
+          {% elif details.covers %}
+          <img src="https://covers.openlibrary.org/b/id/{{ details.covers.0 }}-L.jpg" 
+               alt="{{ details.title|default:'Libro' }}" 
+               class="poster-image">
+          {% else %}
+          <div class="poster-placeholder">
+            {% if item_type == 'movie' %}🎬{% elif item_type == 'tv' %}📺{% else %}📖{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="detail-info">
+          {% if details.overview %}
+          <div class="detail-section">
+            <h3>Sinopsis</h3>
+            <p>{{ details.overview }}</p>
+          </div>
+          {% else %}
+          <div class="detail-section">
+            <h3>Sinopsis</h3>
+            <p>No hay descripción disponible.</p>
+          </div>
+          {% endif %}
+          
+          <div class="detail-meta">
+            {% if details.vote_average %}
+            <div class="meta-item">
+              <strong>Rating:</strong>
+              <span>⭐ {{ details.vote_average }}/10</span>
+            </div>
+            {% endif %}
+            
+            {% if details.release_date %}
+            <div class="meta-item">
+              <strong>Fecha de lanzamiento:</strong>
+              <span>{{ details.release_date }}</span>
+            </div>
+            {% endif %}
+            
+            {% if details.first_publish_year %}
+            <div class="meta-item">
+              <strong>Año de publicación:</strong>
+              <span>{{ details.first_publish_year }}</span>
+            </div>
+            {% endif %}
+            
+            {% if details.genres %}
+            <div class="meta-item">
+              <strong>Géneros:</strong>
+              <span>
+                {% for genre in details.genres %}
+                  {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- BOTÓN CORREGIDO -->
+          <div class="detail-actions">
+            <button class="btn btn-primary" 
+                    onclick="addToFavorites('{{ item_type }}', '{{ item_id }}', '{{ details.title|default:details.name|default:Contenido }}')">
+              ❤️ Agregar a Favoritos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="error-container">
+      <h2>No se pudieron cargar los detalles</h2>
+      <p>El contenido solicitado no está disponible en este momento.</p>
+      <a href="{% url 'dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+    </div>
+    {% endif %}
+  </main>
+
+  <style>
+  .detail-container {
+    padding: 2rem 0;
+  }
+  
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .detail-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: #1f2937;
+  }
+  
+  .detail-source {
+    background: #e5e7eb;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .detail-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+  }
+  
+  .poster-image {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .poster-placeholder {
+    width: 100%;
+    height: 450px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: #9ca3af;
+  }
+  
+  .detail-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #374151;
+  }
+  
+  .detail-section p {
+    line-height: 1.6;
+    color: #6b7280;
+  }
+  
+  .detail-meta {
+    margin: 2rem 0;
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  
+  .meta-item {
+    margin-bottom: 0.75rem;
+    display: flex;
+  }
+  
+  .meta-item strong {
+    min-width: 150px;
+    color: #374151;
+  }
+  
+  .meta-item span {
+    color: #6b7280;
+  }
+  
+  .detail-actions {
+    margin-top: 2rem;
+  }
+  </style>
+
+  <script>
+  function addToFavorites(itemType, itemId, itemTitle) {
+    const formData = new FormData()
+    formData.append('item_type', itemType);
+    formData.append('item_id', itemId);
+    formData.append('item_title', itemTitle);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+    fetch('{% url "add_favorite" %}', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert(`"${itemTitle}" agregado a favoritos!`);
+      } else {
+        alert(data.message || 'Error al agregar a favoritos');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error de conexión');
+    });
+  }
+  </script>
+</body>
+{% endblock content %}
