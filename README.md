@@ -21,12 +21,12 @@ Sistema de recomendaciones de películas, series y libros usando Django y APIs e
 
 ```bash
 # Con Docker (recomendado)
-git clone https://github.com/tu-usuario/streamadvisor-suggestix.git
+git clone https://github.com/Issac-01/suggestix.git
 cd streamadvisor-suggestix
 docker-compose up
 
 # Sin Docker
-git clone https://github.com/tu-usuario/streamadvisor-suggestix.git
+git clone https://github.com/Issac-01/suggestix.git
 cd streamadvisor-suggestix
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
